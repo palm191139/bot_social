@@ -1,0 +1,40 @@
+version: '3'
+
+services:
+  twitch:
+    image: twitch_bot_docker
+    build:
+        context: twitch
+        dockerfile: Dockerfile
+    container_name: twitch
+    command: nodemon bot.js
+    volumes:
+      - ./twitch:/usr/src/twitch
+      - /twitch/node_modules
+    ports:
+      - '9000:9000'
+    depends_on:
+      - db_socket
+
+  db_socket:
+    image: db_socket
+    build:
+        context: db
+        dockerfile: Dockerfile
+    container_name: db_socket
+    command: nodemon server.js
+    volumes:
+      - ./db:/usr/src/db_socket
+      - /db/node_modules
+    ports:
+      - '9001:9001'
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo
+    container_name: db
+    ports:
+      - '29000:29000'
+    volumes:
+      - ./db/data:/data/db
